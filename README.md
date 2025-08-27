@@ -1,4 +1,8 @@
-# React + Vite
+# To Do
+
+To do-list made for a Web Application course at Oulu University of Applied Sciences
+
+
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
