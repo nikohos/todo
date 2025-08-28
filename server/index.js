@@ -28,7 +28,7 @@ app.get('/', (req, res) => {
     if (err) {
        return res.status(500).json({error: err.message})
     }
-    res.status(200).json({result: "Success"})
+    res.status(200).json(result.rows)
  })
 })
 
