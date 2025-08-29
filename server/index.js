@@ -66,8 +66,7 @@ app.delete('/delete/:id', (req, res) => {
 
   pool.query(
     'delete from task WHERE id = $1',
-    [id],
-    (err, result) => {
+    [id], (err, result) => {
       if (err) {
         console.error(err.message)
         return res.status(500).json({ error: err.message })
