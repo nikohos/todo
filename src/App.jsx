@@ -22,26 +22,24 @@ function App() {
   }, [])
 
   const addTask = () => {
-  const newTask = { description: task }
-
-  axios.post(url + "/create", { task: newTask })
+  axios.post(url, { title: task })
     .then(response => {
       setTasks([...tasks, response.data])
       setTask('')
     })
     .catch(error => {
-      alert(error.response ? error.response.data.error.message : error)
+      alert(error.response ? error.response.data.message : error)
     })
 }
 
 
   const deleteTask = (deleted) => {
-  axios.delete(url + "/delete/" + deleted)
-    .then(response => { 
+  axios.delete(`${url}/${deleted}`)
+    .then(() => {
       setTasks(tasks.filter(item => item.id !== deleted))
     })
     .catch(error => {
-      alert(error.response ? error.response.data.error.message : error) 
+      alert(error.response ? error.response.data.message : error)
     })
 }
 

@@ -14,4 +14,3 @@ INSERT INTO task (description) VALUES
 ('Fix the reported bugs'),
 ('Deploy the application to production'),
 ('Conduct a code review with peers');
-
