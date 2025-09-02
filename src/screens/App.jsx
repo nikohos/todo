@@ -1,70 +1,72 @@
-import { useEffect, useState } from 'react'
-import { useUser } from '../context/useUser'
+import { useState, useEffect } from 'react'
+import '../App.css' 
 import axios from 'axios'
 import Row from '../components/Row'
+import { useUser } from '../context/useUser'
 
-const url = "http://localhost:3001"
+function App() {
+    const [task, setTask] = useState('')
+    const [tasks, setTasks] = useState([])
+    const { user } = useUser()
 
-export default function App() {
-  const [task, setTask] = useState('')
-  const [tasks, setTasks] = useState([])
-  const { user } = useUser()
+    useEffect(() => {
+        axios.get(import.meta.env.VITE_API_URL)
+            .then(response => {
+                setTasks(response.data)
+            })
+            .catch(error => {
+                alert(error.response?.data ? error.response.data.message : error)
+            })
+    }, [])
 
-  useEffect(() => {
-    const headers = { headers: { Authorization: user.token } }
+    const addTask = async () => {
+        const headers = {headers: {Authorization: user.token}}
+        const newTask = { description: task }
 
-    axios.get(url + "/tasks", headers)
-      .then(response => {
-        setTasks(response.data)
-      })
-      .catch(error => {
-        console.error("Failed to fetch tasks:", error)
-      })
-  }, [user.token])
+        axios.post(`${import.meta.env.VITE_API_URL}/create`, {task: newTask}, headers)
+            .then(response => {
+                setTasks([...tasks, response.data])
+                setTask('')
+            })
+            .catch(error => {
+                alert(error.response?.data ? error.response.data.error : error)
+            })
+    }
 
-  const addTask = () => {
-    const headers = { headers: { Authorization: user.token } }
-    const newTask = { description: task }
+    const deleteTask = (deleted) => {
+        const headers = {headers: {Authorization: user.token}}
+        axios.delete(`${import.meta.env.VITE_API_URL}/delete/${deleted}`, headers)
+            .then(response => {
+                setTasks(tasks.filter(t => t.id !== deleted))
+            })
+            .catch(error => {
+                alert(error.response?.data ? error.response.data.error : error)
+            })
+    }
 
-    axios.post(url + "/create", { task: newTask }, headers)
-      .then(response => {
-        setTasks([...tasks, response.data])
-        setTask('')
-      })
-      .catch(error => {
-        alert("Failed to add task: " + error.message)
-      })
-  }
-
-  const deleteTask = (deletedId) => {
-    const headers = { headers: { Authorization: user.token } }
-
-    axios.delete(url + "/delete/" + deletedId, headers)
-      .then(() => {
-        setTasks(tasks.filter(item => item.id !== deletedId))
-      })
-      .catch(error => {
-        alert("Failed to delete task: " + error.message)
-      })
-  }
-
-  return (
-    <div className="app-container">
-      <h2>Task Manager</h2>
-
-      <input
-        type="text"
-        placeholder="New task"
-        value={task}
-        onChange={e => setTask(e.target.value)}
-      />
-      <button onClick={addTask}>Add Task</button>
-
-      <ul>
-        {tasks.map(item => (
-          <Row key={item.id} task={item} onDelete={() => deleteTask(item.id)} />
-        ))}
-      </ul>
-    </div>
-  )
+    return (
+        <div id="container">
+            <h3>Todos</h3>
+            <form>
+                <input
+                    placeholder="Add new task"
+                    value={task}
+                    onChange={(e) => setTask(e.target.value)}
+                    onKeyDown={e => {
+                        if (e.key === 'Enter') {
+                            e.preventDefault()
+                            addTask()
+                        }
+                    }}
+                />
+            </form>
+            <ul>
+                {tasks.map(item => (
+                    <Row item={item} key={item.id} deleteTask={deleteTask} />
+                ))}
+            </ul>
+        </div>
+    )
 }
+
+export default App
