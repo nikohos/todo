@@ -22,15 +22,19 @@ function App() {
   }, [])
 
   const addTask = () => {
-  axios.post(url, { title: task })
-    .then(response => {
-      setTasks([...tasks, response.data])
-      setTask('')
-    })
-    .catch(error => {
-      alert(error.response ? error.response.data.message : error)
-    })
+  if (!task.trim()) return
+
+  axios.post(url, { description: task })
+  .then(response => {
+    setTasks([...tasks, response.data]);
+    setTask('');
+  })
+  .catch(error => {
+    console.error('Add task failed:', error);
+  })
+
 }
+
 
 
   const deleteTask = (deleted) => {
